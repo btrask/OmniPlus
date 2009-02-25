@@ -106,7 +106,7 @@ static NSMenu *OPRSSMenu;
 	NSArray *const feeds = [tab respondsToSelector:@selector(rssFeeds)] ? [tab rssFeeds] : nil;
 	NSBundle *const bundle = [NSBundle bundleForClass:self];
 	for(NSDictionary *const feed in feeds) {
-		NSString *const title = [feed objectForKey:@"title"];
+		NSString *const title = [feed respondsToSelector:@selector(objectForKey:)] ? [feed objectForKey:@"title"] : nil;
 		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:(title ? title : NSLocalizedStringFromTableInBundle(@"Untitled Feed", nil, bundle, nil)) action:@selector(subscribeToRSSFeed:) keyEquivalent:@""] autorelease];
 		[item setRepresentedObject:feed];
 		[item setTarget:tab];
