@@ -41,9 +41,9 @@ static id (*OPBrowserWindowInitOriginal)(id, SEL, NSRect, NSUInteger, NSBackingS
 
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)aStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)flag
 {
-	if(OPBrowserWindowInitOriginal) self = OPBrowserWindowInitOriginal(self, _cmd, contentRect, aStyle, bufferingType, flag);
-	else self = [super initWithContentRect:contentRect styleMask:aStyle backing:bufferingType defer:flag];
-	if([self respondsToSelector:@selector(setShowsToolbarButton:)]) [self setShowsToolbarButton:NO];
+	if((self = OPBrowserWindowInitOriginal(self, _cmd, contentRect, aStyle, bufferingType, flag))) {
+		if([self respondsToSelector:@selector(setShowsToolbarButton:)]) [self setShowsToolbarButton:NO];
+	}
 	return self;
 }
 

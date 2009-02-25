@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSMenuAdditions.h"
 #import "NSObjectAdditions.h"
 
+static Class OPOWBrowserController;
 static void (*OPBrowserControllerSetLinkHoverTextOriginal)(id, SEL, NSString *);
 static BOOL (*OPBrowserControllerValidateMenuItemOriginal)(id, SEL, NSMenuItem *);
 
@@ -34,7 +35,6 @@ static NSMenu *OPRSSMenu;
 @interface NSObject(OP_OWMethods)
 
 // OWBrowserController
-- (NSWindow *)window;
 - (NSString *)documentTitle;
 - (void)setWindowTitle:(NSString *)aString;
 - (BOOL)statusBarVisible;
@@ -71,7 +71,8 @@ static NSMenu *OPRSSMenu;
 + (void)load
 {
 	if(floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) return;
-	OPBrowserControllerSetLinkHoverTextOriginal = (void (*)(id, SEL, NSString *))[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(setLinkHoverText:)];
+	OPOWBrowserController = NSClassFromString(@"OWBrowserController");
+	OPBrowserControllerSetLinkHoverTextOriginal = (void (*)(id, SEL, NSString *))[OPOWBrowserController OP_useImplementationFromClass:self forSelector:@selector(setLinkHoverText:)];
 
 	NSMenu *menu = nil;
 	NSUInteger index = 0;
@@ -80,8 +81,8 @@ static NSMenu *OPRSSMenu;
 		NSMenuItem *const jsItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Turn JavaScript On", nil, bundle, nil) action:@selector(OP_toggleJavaScriptEnabled:) keyEquivalent:@"x"] autorelease];
 		[jsItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
 		[menu insertItem:jsItem atIndex:index + 1];
-		OPBrowserControllerValidateMenuItemOriginal = (BOOL (*)(id, SEL, NSMenuItem *))[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(validateMenuItem:)];
-		(void)[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(OP_toggleJavaScriptEnabled:)];
+		OPBrowserControllerValidateMenuItemOriginal = (BOOL (*)(id, SEL, NSMenuItem *))[OPOWBrowserController OP_useImplementationFromClass:self forSelector:@selector(validateMenuItem:)];
+		(void)[OPOWBrowserController OP_useImplementationFromClass:self forSelector:@selector(OP_toggleJavaScriptEnabled:)];
 	}
 	if([[NSApp mainMenu] OP_getMenu:&menu index:&index ofItemWithTarget:nil action:@selector(openNextChangedBookmark:)]) {
 		NSString *const title = NSLocalizedStringFromTableInBundle(@"Add News Feed", nil, bundle, nil);
@@ -124,7 +125,7 @@ static NSMenu *OPRSSMenu;
 
 - (void)setLinkHoverText:(NSString *)aString
 {
-	if(OPBrowserControllerSetLinkHoverTextOriginal) OPBrowserControllerSetLinkHoverTextOriginal(self, _cmd, aString);
+	if([OPOWBrowserController instancesRespondToSelector:@selector(setLinkHoverText:)]) OPBrowserControllerSetLinkHoverTextOriginal(self, _cmd, aString);
 	if([self respondsToSelector:@selector(setWindowTitle:)] && [self respondsToSelector:@selector(documentTitle)] && [self respondsToSelector:@selector(statusBarVisible)] && ![self statusBarVisible]) [self setWindowTitle:(aString ? aString : [self documentTitle])];
 }
 
@@ -139,7 +140,8 @@ static NSMenu *OPRSSMenu;
 		[anItem setTitle:([sitePref respondsToSelector:@selector(boolValue)] && [sitePref boolValue] ? NSLocalizedStringFromTableInBundle(@"Turn JavaScript Off", nil, bundle, nil) : NSLocalizedStringFromTableInBundle(@"Turn JavaScript On", nil, bundle, nil))];
 		return [self respondsToSelector:action];
 	}
-	return OPBrowserControllerValidateMenuItemOriginal ? OPBrowserControllerValidateMenuItemOriginal(self, _cmd, anItem) : [self respondsToSelector:action];
+	if([OPOWBrowserController instancesRespondToSelector:@selector(validateMenuItem:)]) return OPBrowserControllerValidateMenuItemOriginal(self, _cmd, anItem);
+	return [self respondsToSelector:action];
 }
 
 @end
