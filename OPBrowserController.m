@@ -78,7 +78,6 @@ static NSMenu *OPRSSMenu;
 	NSBundle *const bundle = [NSBundle bundleForClass:self];
 	if([[NSApp mainMenu] OP_getMenu:&menu index:&index ofItemWithTarget:nil action:@selector(toggleSitePreferences:)]) {
 		NSMenuItem *const jsItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Turn JavaScript On", nil, bundle, nil) action:@selector(OP_toggleJavaScriptEnabled:) keyEquivalent:@"x"] autorelease];
-		[jsItem setIndentationLevel:1];
 		[jsItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
 		[menu insertItem:jsItem atIndex:index + 1];
 		OPBrowserControllerValidateMenuItemOriginal = (BOOL (*)(id, SEL, NSMenuItem *))[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(validateMenuItem:)];
