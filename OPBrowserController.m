@@ -49,9 +49,6 @@ static NSMenu *OPRSSMenu;
 - (BOOL)boolValue;
 - (void)setBoolValue:(BOOL)flag;
 
-// NSString(RSSExtensions)
-- (id)rssTitleString;
-
 @end
 
 @implementation OPBrowserController
