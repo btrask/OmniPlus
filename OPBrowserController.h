@@ -26,8 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface OPBrowserController : NSResponder
 
++ (id)activeTabForBrowserController:(id)browserController;
 + (id)javaScriptPreferenceForBrowserController:(id)browserController;
+
 - (IBAction)OP_toggleJavaScriptEnabled:(id)sender;
-- (void)setLinkHoverText:(NSString *)aString;
 
 @end

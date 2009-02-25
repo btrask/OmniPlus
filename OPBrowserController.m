@@ -29,20 +29,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 static void (*OPBrowserControllerSetLinkHoverTextOriginal)(id, SEL, NSString *);
 static BOOL (*OPBrowserControllerValidateMenuItemOriginal)(id, SEL, NSMenuItem *);
 
+static NSMenu *OPRSSMenu;
+
 @interface NSObject(OP_OWMethods)
 
 // OWBrowserController
+- (NSWindow *)window;
 - (NSString *)documentTitle;
 - (void)setWindowTitle:(NSString *)aString;
 - (BOOL)statusBarVisible;
 - (id)activeTab;
+- (void)setLinkHoverText:(NSString *)aString;
 
 // OWTab
+- (id)rssFeeds;
 - (id)preferenceForKey:(id)aString;
 
 // OWSitePreference
 - (BOOL)boolValue;
 - (void)setBoolValue:(BOOL)flag;
+
+// NSString(RSSExtensions)
+- (id)rssTitleString;
 
 @end
 
@@ -50,10 +58,13 @@ static BOOL (*OPBrowserControllerValidateMenuItemOriginal)(id, SEL, NSMenuItem *
 
 #pragma mark +OPBrowserController
 
++ (id)activeTabForBrowserController:(id)browserController
+{
+	return [browserController respondsToSelector:@selector(activeTab)] ? [browserController activeTab] : nil;
+}
 + (id)javaScriptPreferenceForBrowserController:(id)browserController
 {
-	if(![browserController respondsToSelector:@selector(activeTab)]) return nil;
-	id const tab = [browserController activeTab];
+	id const tab = [self activeTabForBrowserController:browserController];
 	if(![tab respondsToSelector:@selector(preferenceForKey:)]) return nil;
 	return [tab preferenceForKey:@"JavaScriptEnabled"];
 }
@@ -67,14 +78,41 @@ static BOOL (*OPBrowserControllerValidateMenuItemOriginal)(id, SEL, NSMenuItem *
 
 	NSMenu *menu = nil;
 	NSUInteger index = 0;
+	NSBundle *const bundle = [NSBundle bundleForClass:self];
 	if([[NSApp mainMenu] OP_getMenu:&menu index:&index ofItemWithTarget:nil action:@selector(toggleSitePreferences:)]) {
-		NSMenuItem *const jsItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Turn JavaScript On", nil, [NSBundle bundleForClass:self], nil) action:@selector(OP_toggleJavaScriptEnabled:) keyEquivalent:@"x"] autorelease];
+		NSMenuItem *const jsItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Turn JavaScript On", nil, bundle, nil) action:@selector(OP_toggleJavaScriptEnabled:) keyEquivalent:@"x"] autorelease];
 		[jsItem setIndentationLevel:1];
 		[jsItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
 		[menu insertItem:jsItem atIndex:index + 1];
 		OPBrowserControllerValidateMenuItemOriginal = (BOOL (*)(id, SEL, NSMenuItem *))[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(validateMenuItem:)];
 		(void)[NSClassFromString(@"OWBrowserController") OP_useImplementationFromClass:self forSelector:@selector(OP_toggleJavaScriptEnabled:)];
 	}
+	if([[NSApp mainMenu] OP_getMenu:&menu index:&index ofItemWithTarget:nil action:@selector(openNextChangedBookmark:)]) {
+		NSString *const title = NSLocalizedStringFromTableInBundle(@"Add News Feed", nil, bundle, nil);
+		NSMenuItem *const RSSItem = [[[NSMenuItem alloc] initWithTitle:title action:NULL keyEquivalent:@""] autorelease];
+		OPRSSMenu = [[NSMenu alloc] initWithTitle:title];
+		[OPRSSMenu setDelegate:self];
+		[RSSItem setSubmenu:OPRSSMenu];
+		[menu insertItem:RSSItem atIndex:index];
+	}
+}
+
+#pragma mark +NSObject(NSMenuDelegate)
+
++ (void)menuNeedsUpdate:(NSMenu *)menu
+{
+	while([OPRSSMenu numberOfItems]) [OPRSSMenu removeItemAtIndex:0];
+	id const tab = [OPBrowserController activeTabForBrowserController:[[NSApp mainWindow] delegate]];
+	NSArray *const feeds = [tab respondsToSelector:@selector(rssFeeds)] ? [tab rssFeeds] : nil;
+	NSBundle *const bundle = [NSBundle bundleForClass:self];
+	for(NSDictionary *const feed in feeds) {
+		NSString *const title = [feed objectForKey:@"title"];
+		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:(title ? title : NSLocalizedStringFromTableInBundle(@"Untitled Feed", nil, bundle, nil)) action:@selector(subscribeToRSSFeed:) keyEquivalent:@""] autorelease];
+		[item setRepresentedObject:feed];
+		[item setTarget:tab];
+		[OPRSSMenu addItem:item];
+	}
+	if(![OPRSSMenu numberOfItems]) [OPRSSMenu addItem:[[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"No Feeds", nil, bundle, nil) action:NULL keyEquivalent:@""] autorelease]];
 }
 
 #pragma mark -OPBrowserController
