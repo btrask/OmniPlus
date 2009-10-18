@@ -131,7 +131,6 @@ static NSMenu *OPRSSMenu;
 		NSMenuItem *const randomItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Open Random Favorite", nil, bundle, nil) action:@selector(OP_openRandomBookmark:) keyEquivalent:@""] autorelease];
 		[randomItem setTarget:self];
 		[menu insertItem:randomItem atIndex:index + 1];
-		(void)[OPOWBrowserController OP_useImplementationFromClass:self forSelector:@selector(OP_openRandomBookmark:)];
 		srandomdev();
 	}
 }
