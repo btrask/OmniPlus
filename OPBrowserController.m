@@ -77,6 +77,29 @@ static NSMenu *OPRSSMenu;
 	if(![tab respondsToSelector:@selector(preferenceForKey:)]) return nil;
 	return [tab preferenceForKey:@"JavaScriptEnabled"];
 }
++ (IBAction)OP_openRandomBookmark:(id)sender
+{
+	do {
+		Class const b = NSClassFromString(@"OWBookmarks");
+		if(![b respondsToSelector:@selector(favoritesBookmarks)]) break;
+		id const container = [b favoritesBookmarks];
+		if(![container respondsToSelector:@selector(topBookmark)]) break;
+		id const topBookmark = [container topBookmark];
+		if(![topBookmark respondsToSelector:@selector(children)]) break;
+		NSArray *const bookmarks = [topBookmark children];
+		if(![bookmarks isKindOfClass:[NSArray class]] || ![bookmarks count]) break;
+		id const bookmark = [bookmarks objectAtIndex:random() % [bookmarks count]];
+		if(![bookmark respondsToSelector:@selector(address)]) break;
+		id const address = [(NSObject *)bookmark address];
+		Class const c = NSClassFromString(@"OWController");
+		if(![c respondsToSelector:@selector(sharedController)]) break;
+		id const controller = [c sharedController];
+		if(![controller respondsToSelector:@selector(openURL:userData:error:)]) break;
+		[controller openAddressInPreferredWindow:address];
+		return;
+	} while(NO);
+	NSBeep();
+}
 
 #pragma mark +NSObject
 
@@ -106,6 +129,7 @@ static NSMenu *OPRSSMenu;
 	}
 	if([[NSApp mainMenu] OP_getMenu:&menu index:&index ofItemWithTarget:nil action:@selector(openAllChangedBookmarks:)]) {
 		NSMenuItem *const randomItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Open Random Favorite", nil, bundle, nil) action:@selector(OP_openRandomBookmark:) keyEquivalent:@""] autorelease];
+		[randomItem setTarget:self];
 		[menu insertItem:randomItem atIndex:index + 1];
 		(void)[OPOWBrowserController OP_useImplementationFromClass:self forSelector:@selector(OP_openRandomBookmark:)];
 		srandomdev();
@@ -137,29 +161,6 @@ static NSMenu *OPRSSMenu;
 	id const sitePref = [OPBrowserController javaScriptPreferenceForBrowserController:self];
 	if([sitePref respondsToSelector:@selector(setBoolValue:)] && [sitePref respondsToSelector:@selector(boolValue)]) [sitePref setBoolValue:![sitePref boolValue]];
 	else NSBeep();
-}
-- (IBAction)OP_openRandomBookmark:(id)sender
-{
-	do {
-		Class const b = NSClassFromString(@"OWBookmarks");
-		if(![b respondsToSelector:@selector(favoritesBookmarks)]) break;
-		id const container = [b favoritesBookmarks];
-		if(![container respondsToSelector:@selector(topBookmark)]) break;
-		id const topBookmark = [container topBookmark];
-		if(![topBookmark respondsToSelector:@selector(children)]) break;
-		NSArray *const bookmarks = [topBookmark children];
-		if(![bookmarks isKindOfClass:[NSArray class]] || ![bookmarks count]) break;
-		id const bookmark = [bookmarks objectAtIndex:random() % [bookmarks count]];
-		if(![bookmark respondsToSelector:@selector(address)]) break;
-		id const address = [(NSObject *)bookmark address];
-		Class const c = NSClassFromString(@"OWController");
-		if(![c respondsToSelector:@selector(sharedController)]) break;
-		id const controller = [c sharedController];
-		if(![controller respondsToSelector:@selector(openURL:userData:error:)]) break;
-		[controller openAddressInPreferredWindow:address];
-		return;
-	} while(NO);
-	NSBeep();
 }
 
 #pragma mark -OWBrowserController
