@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0E4812050F541FD100B74A28 /* OPBrowserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E4812040F541FD100B74A28 /* OPBrowserController.m */; };
-		0E4812080F5420B400B74A28 /* OPBrowserWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E4812070F5420B400B74A28 /* OPBrowserWindow.m */; };
 		0E48120B0F54214D00B74A28 /* NSObjectAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E48120A0F54214D00B74A28 /* NSObjectAdditions.m */; };
 		0E48120E0F5422C700B74A28 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0E48120C0F5422C700B74A28 /* Localizable.strings */; };
 		0E4812110F54237200B74A28 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E48120F0F54237200B74A28 /* NSMenuAdditions.m */; };
@@ -22,8 +21,6 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		0E4812030F541FD100B74A28 /* OPBrowserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OPBrowserController.h; sourceTree = "<group>"; };
 		0E4812040F541FD100B74A28 /* OPBrowserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OPBrowserController.m; sourceTree = "<group>"; };
-		0E4812060F5420B400B74A28 /* OPBrowserWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OPBrowserWindow.h; sourceTree = "<group>"; };
-		0E4812070F5420B400B74A28 /* OPBrowserWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OPBrowserWindow.m; sourceTree = "<group>"; };
 		0E4812090F54214D00B74A28 /* NSObjectAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSObjectAdditions.h; sourceTree = "<group>"; };
 		0E48120A0F54214D00B74A28 /* NSObjectAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSObjectAdditions.m; sourceTree = "<group>"; };
 		0E48120D0F5422C700B74A28 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -84,8 +81,6 @@
 			children = (
 				0E4812030F541FD100B74A28 /* OPBrowserController.h */,
 				0E4812040F541FD100B74A28 /* OPBrowserController.m */,
-				0E4812060F5420B400B74A28 /* OPBrowserWindow.h */,
-				0E4812070F5420B400B74A28 /* OPBrowserWindow.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -184,7 +179,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E4812050F541FD100B74A28 /* OPBrowserController.m in Sources */,
-				0E4812080F5420B400B74A28 /* OPBrowserWindow.m in Sources */,
 				0E48120B0F54214D00B74A28 /* NSObjectAdditions.m in Sources */,
 				0E4812110F54237200B74A28 /* NSMenuAdditions.m in Sources */,
 			);
